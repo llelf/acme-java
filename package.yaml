@@ -4,6 +4,6 @@ name: acme-java
 executables:
   ghcj:
     main: Main.hs
-    # dependencies:
-    #   - hpack
-    #   - aeson >= 0.8
+    dependencies:
+      - base < 5
+      - process

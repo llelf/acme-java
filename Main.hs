@@ -1,6 +1,8 @@
 import Data.Monoid
 import Control.Applicative
+import System.Environment
 import System.Process
+import Text.Printf
 
 findJDKIncludes :: IO [FilePath]
 findJDKIncludes = pure [ base, base <> "/darwin" ]
@@ -12,15 +14,23 @@ findJDKIncludes = pure [ base, base <> "/darwin" ]
 jar = "jar"
 ghc = "ghc"
 
-compile = do
+haskellLib = "haskell.lib"
+
+jarName hsFile = name <> ".jar"
+    where (name,ext) = break (=='.') hsFile
+
+
+compile file = do
   includes <- (map ("-I"<>)) <$> findJDKIncludes
-  callProcess ghc $ includes <> ["-static", "-fPIC", "start.c", "hello.hs", "-o", "hello.dylib" ]
+  callProcess ghc $ includes <> ["-static", "-fPIC",
+                                 "start.c",
+                                 file, "-o", haskellLib ]
 
-createJAR = callProcess jar $ ["cfe", "hi.jar", "Main", "Main.class", "hello.dylib" ]
+createJAR file = callProcess jar $ ["cfe", jarName file,
+                                    "Main", "Main.class", haskellLib ]
 
-
-
-main = do compile
-          createJAR
-          putStrLn "Done."
+main = do file <- head <$> getArgs
+          compile file
+          createJAR file
+          putStrLn $ printf "Done, %s created." (jarName file)
 

@@ -9,7 +9,7 @@ class Main {
     static {
 	try {
 
-	    String fname = "hello", fext = ".dylib";
+	    String fname = "haskell", fext = ".lib";
 	    String f = fname + fext;
 	    File temp = File.createTempFile(fname, fext);
 	    temp.deleteOnExit();
